@@ -1,0 +1,77 @@
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  color: #0f172a;
+}
+
+/* HERO */
+.hero {
+  padding: 100px 60px;
+  background: #f8fafc;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 42px;
+  margin-bottom: 20px;
+}
+
+.hero p {
+  font-size: 17px;
+  max-width: 800px;
+  margin: 0 auto 35px;
+  color: #475569;
+}
+
+.hero button {
+  padding: 14px 36px;
+  font-size: 16px;
+  background: #0f172a;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+/* FEATURES */
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  padding: 80px 80px;
+  background: white;
+}
+
+.features h3 {
+  margin-bottom: 10px;
+}
+
+.features p {
+  color: #475569;
+  line-height: 1.6;
+}
+
+/* IMPACT */
+.impact {
+  padding: 80px;
+  background: #f1f5f9;
+  text-align: center;
+}
+
+.impact h2 {
+  margin-bottom: 20px;
+}
+
+.impact p {
+  max-width: 900px;
+  margin: auto;
+  color: #475569;
+  line-height: 1.7;
+}
+
+/* FOOTER */
+.footer {
+  padding: 20px;
+  text-align: center;
+  background: #0f172a;
+  color: #cbd5f5;
+}

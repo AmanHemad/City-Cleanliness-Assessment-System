@@ -1,0 +1,38 @@
+.map-page {
+  padding: 24px 32px;
+  background: #f4f6f8;
+  min-height: 100vh;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+.map-page h2 {
+  text-align: center;
+  margin-bottom: 16px;
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.map-container {
+  height: 550px;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  overflow: hidden;
+}
+
+/* BLINKING EFFECT FOR EXTREME BAD */
+.blink {
+  animation: blink-animation 1s infinite;
+}
+
+@keyframes blink-animation {
+  0% {
+    fill-opacity: 0.2;
+  }
+  50% {
+    fill-opacity: 0.8;
+  }
+  100% {
+    fill-opacity: 0.2;
+  }
+}
