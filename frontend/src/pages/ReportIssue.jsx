@@ -2,38 +2,61 @@ import { useState } from "react";
 
 function ReportIssue() {
   const [image, setImage] = useState(null);
-  const [location, setLocation] = useState("");
+  const [status, setStatus] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(image, location);
-    alert("Issue submitted (backend coming next)");
+  const handleSubmit = () => {
+    if (!image) {
+      alert("Please select an image");
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      alert("Geolocation not supported");
+      return;
+    }
+
+    setStatus("Getting location...");
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        const formData = new FormData();
+        formData.append("image", image);
+        formData.append("latitude", latitude);
+        formData.append("longitude", longitude);
+
+        setStatus("Uploading data...");
+        
+        await fetch("http://localhost:5000/api/report", {
+
+          method: "POST",
+          body: formData,
+        });
+
+        setStatus("Uploaded successfully ✅");
+      },
+      () => {
+        alert("Location permission denied");
+        setStatus("");
+      }
+    );
   };
 
   return (
     <div style={{ padding: "30px" }}>
-      <h2>Report Cleanliness Issue</h2>
+      <h2>Report Road / Cleanliness Issue</h2>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setImage(e.target.files[0])}
-          required
-        />
-        <br /><br />
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => setImage(e.target.files[0])}
+      />
+      <br /><br />
 
-        <input
-          type="text"
-          placeholder="Enter location / area"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          required
-        />
-        <br /><br />
-
-        <button type="submit">Submit</button>
-      </form>
+      <button onClick={handleSubmit}>Upload</button>
+      <p>{status}</p>
     </div>
   );
 }
