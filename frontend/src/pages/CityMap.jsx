@@ -1,79 +1,97 @@
-import { MapContainer, TileLayer, Circle } from "react-leaflet";
-import { useNavigate } from "react-router-dom";
+import { MapContainer, TileLayer, Circle, Popup } from "react-leaflet";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
-import "./CityMap.css";
 
-function CityMap() {
+const CityMap = () => {
+  const [reports, setReports] = useState([]);
   const navigate = useNavigate();
-  const [data, setData] = useState([]);
+
+  useEffect(() => {
+  const fetchReports = () => {
+    fetch("http://localhost:5000/api/reports")
+      .then(res => res.json())
+      .then(data => setReports(data));
+  };
+
+  fetchReports();
+  const interval = setInterval(fetchReports, 5000); // every 5 sec
+
+  return () => clearInterval(interval);
+}, []);
 
   useEffect(() => {
     fetch("http://localhost:5000/api/reports")
-    
       .then((res) => res.json())
-      .then((data) => setData(data));
+      .then((data) => setReports(data))
+      .catch((err) => console.error(err));
   }, []);
 
+  const center =
+    reports.length > 0
+      ? [reports[0].latitude, reports[0].longitude]
+      : [16.5104, 80.6465];
+
+  const getColor = (condition) => {
+    if (condition === "BAD") return "red";
+    if (condition === "MODERATE") return "orange";
+    return "green";
+  };
+
   return (
-    <div className="map-page">
-      {/* 🔹 HEADER + REPORT BUTTON (HERE) */}
-      <div
+    <div style={{ position: "relative" }}>
+      {/* 🔴 REPORT ISSUE BUTTON */}
+      <button
+        onClick={() => navigate("/report")}
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "12px",
+          position: "absolute",
+          top: "20px",
+          right: "20px",
+          zIndex: 1000,
+          padding: "10px 16px",
+          backgroundColor: "#d32f2f",
+          color: "white",
+          border: "none",
+          borderRadius: "8px",
+          cursor: "pointer",
+          fontWeight: "bold",
         }}
       >
-        <h2>Campus Cleanliness Map</h2>
+        🚨 Report an Issue
+      </button>
 
-        <button
-          onClick={() => navigate("/report")}
-          style={{
-            padding: "10px 18px",
-            background: "#2563eb",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-          }}
-        >
-          + Report an Issue
-        </button>
-      </div>
+      <MapContainer center={center} zoom={15} style={{ height: "100vh" }}>
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-      {/* 🔹 MAP STARTS HERE */}
-      <MapContainer
-         center={[16.5104, 80.6465]}
-        zoom={17}
-        className="map-container"
-      >
-        <TileLayer
-          attribution="© OpenStreetMap contributors"
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-
-        {data.map((item, i) => (
+        {reports.map((report) => (
           <Circle
-            key={i}
-            center={[item.latitude, item.longitude]}
-            radius={60}
-            pathOptions={{
-              color:
-                item.mlScore >= 80
-                  ? "green"
-                  : item.mlScore >= 40
-                  ? "orange"
-                  : "red",
-              fillOpacity: 0.4,
-              className: item.mlScore < 40 ? "blink" : "",
-            }}
-          />
+            key={report._id}
+            center={[report.latitude, report.longitude]}
+            radius={30}
+            pathOptions={{ color: getColor(report.condition) }}
+          >
+            <Popup>
+              <div style={{ width: "200px" }}>
+                <img
+                  src={`http://localhost:5000/uploads/${report.imageBefore}`}
+                  alt="Issue"
+                  style={{
+                    width: "100%",
+                    borderRadius: "8px",
+                    marginBottom: "8px",
+                  }}
+                />
+                <p><b>Status:</b> {report.status}</p>
+                <p><b>Condition:</b> {report.condition}</p>
+                <p><b>Score:</b> {report.mlScore}</p>
+                <p><b>Reason:</b> {report.reason}</p>
+              </div>
+            </Popup>
+          </Circle>
         ))}
       </MapContainer>
     </div>
   );
-}
+};
 
 export default CityMap;
