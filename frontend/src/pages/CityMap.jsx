@@ -1,36 +1,49 @@
-import { MapContainer, TileLayer, Circle, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Circle, Popup, useMap } from "react-leaflet";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
 
+/* 🔄 Helper to recenter map dynamically */
+const RecenterMap = ({ center }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    map.setView(center, 17);
+  }, [center, map]);
+
+  return null;
+};
+
 const CityMap = () => {
   const [reports, setReports] = useState([]);
+  const [mapCenter, setMapCenter] = useState([16.5104, 80.6465]); // default
   const navigate = useNavigate();
 
+  /* 🔄 Fetch reports every 5 seconds */
   useEffect(() => {
-  const fetchReports = () => {
-    fetch("http://localhost:5000/api/reports")
-      .then(res => res.json())
-      .then(data => setReports(data));
-  };
+    const fetchReports = () => {
+      fetch("http://localhost:5000/api/report")
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("MAP DATA:", data);
+          setReports(data);
 
-  fetchReports();
-  const interval = setInterval(fetchReports, 5000); // every 5 sec
+          if (data.length > 0) {
+            const latest = data[0]; // latest report
+            setMapCenter([
+              Number(latest.latitude),
+              Number(latest.longitude),
+            ]);
+          }
+        })
+        .catch((err) => console.error(err));
+    };
 
-  return () => clearInterval(interval);
-}, []);
+    fetchReports();
+    const interval = setInterval(fetchReports, 5000);
 
-  useEffect(() => {
-    fetch("http://localhost:5000/api/reports")
-      .then((res) => res.json())
-      .then((data) => setReports(data))
-      .catch((err) => console.error(err));
+    return () => clearInterval(interval);
   }, []);
-
-  const center =
-    reports.length > 0
-      ? [reports[0].latitude, reports[0].longitude]
-      : [16.5104, 80.6465];
 
   const getColor = (condition) => {
     if (condition === "BAD") return "red";
@@ -40,7 +53,7 @@ const CityMap = () => {
 
   return (
     <div style={{ position: "relative" }}>
-      {/* 🔴 REPORT ISSUE BUTTON */}
+      {/* 🚨 REPORT ISSUE BUTTON */}
       <button
         onClick={() => navigate("/report")}
         style={{
@@ -60,21 +73,30 @@ const CityMap = () => {
         🚨 Report an Issue
       </button>
 
-      <MapContainer center={center} zoom={15} style={{ height: "100vh" }}>
+      <MapContainer
+        center={mapCenter}
+        zoom={17}
+        style={{ height: "100vh", width: "100%" }}
+      >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+
+        <RecenterMap center={mapCenter} />
 
         {reports.map((report) => (
           <Circle
             key={report._id}
-            center={[report.latitude, report.longitude]}
+            center={[
+              Number(report.latitude),
+              Number(report.longitude),
+            ]}
             radius={30}
             pathOptions={{ color: getColor(report.condition) }}
           >
             <Popup>
               <div style={{ width: "200px" }}>
                 <img
-                  src={`http://localhost:5000/uploads/${report.imageBefore}`}
-                  alt="Issue"
+                  src={report.imageBefore}
+                  alt="road"
                   style={{
                     width: "100%",
                     borderRadius: "8px",
