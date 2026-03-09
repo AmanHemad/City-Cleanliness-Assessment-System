@@ -1,8 +1,19 @@
 import { useState } from "react";
+import "./ReportIssue.css";
 
 function ReportIssue() {
   const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
   const [status, setStatus] = useState("");
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
 
   const handleSubmit = () => {
     if (!image) {
@@ -15,7 +26,7 @@ function ReportIssue() {
       return;
     }
 
-    setStatus("Getting location...");
+    setStatus("📍 Getting location...");
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
@@ -27,15 +38,20 @@ function ReportIssue() {
         formData.append("latitude", latitude);
         formData.append("longitude", longitude);
 
-        setStatus("Uploading data...");
-        
-        await fetch("http://localhost:5000/api/report", {
+        setStatus("⬆ Uploading report...");
 
-          method: "POST",
-          body: formData,
-        });
+        try {
+          await fetch("http://localhost:5000/api/report", {
+            method: "POST",
+            body: formData,
+          });
 
-        setStatus("Uploaded successfully ✅");
+          setStatus("✅ Report uploaded successfully!");
+          setImage(null);
+          setPreview(null);
+        } catch (err) {
+          setStatus("❌ Upload failed");
+        }
       },
       () => {
         alert("Location permission denied");
@@ -45,18 +61,50 @@ function ReportIssue() {
   };
 
   return (
-    <div style={{ padding: "30px" }}>
-      <h2>Report Road / Cleanliness Issue</h2>
+    <div className="report-container">
 
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => setImage(e.target.files[0])}
-      />
-      <br /><br />
+      <div className="report-card">
 
-      <button onClick={handleSubmit}>Upload</button>
-      <p>{status}</p>
+        <h2>Report Road / Cleanliness Issue</h2>
+
+        <p className="report-description">
+          Help keep your city clean. Upload an image of the issue and our
+          system will automatically record the location.
+        </p>
+
+        {/* IMAGE PREVIEW */}
+
+        {preview && (
+          <img
+            src={preview}
+            alt="preview"
+            className="preview-image"
+          />
+        )}
+
+        {/* FILE INPUT */}
+
+        <label className="upload-box">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+          />
+          <span>📷 Select Image</span>
+        </label>
+
+        {/* BUTTON */}
+
+        <button className="upload-btn" onClick={handleSubmit}>
+          Submit Report
+        </button>
+
+        {/* STATUS */}
+
+        {status && <p className="status">{status}</p>}
+
+      </div>
+
     </div>
   );
 }
