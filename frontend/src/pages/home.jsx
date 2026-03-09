@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Components/Navbar";
+import CleaningAnimation from "../Components/CleaningAnimation";
 import "./Home.css";
 import { useEffect, useState } from "react";
 
@@ -44,6 +45,9 @@ function Home() {
       {/* HERO */}
 
       <section className="hero">
+
+        {/* Animation between navbar and title */}
+        <CleaningAnimation/>
 
         <div className="hero-content">
 
