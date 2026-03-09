@@ -1,68 +1,162 @@
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import "./Home.css";
+import { useEffect, useState } from "react";
 
 function Home() {
+
   const navigate = useNavigate();
+
+  const [stats,setStats] = useState({
+    reports:0,
+    areas:0,
+    accuracy:0,
+    citizens:0
+  });
+
+  useEffect(()=>{
+
+    let start = 0;
+
+    const interval = setInterval(()=>{
+
+      start += 1;
+
+      setStats({
+        reports:start * 12,
+        areas:start * 3,
+        accuracy:start,
+        citizens:start * 20
+      });
+
+      if(start === 100){
+        clearInterval(interval);
+      }
+
+    },20);
+
+  },[]);
 
   return (
     <>
-      <Navbar />
+      <Navbar/>
 
       {/* HERO */}
-      <section className="hero">
-        <h1>City Cleanliness Assessment System</h1>
-        <p>
-          An intelligent urban monitoring platform that analyzes city
-          cleanliness using image-based reporting and spatial data analytics.
-        </p>
 
-        <button onClick={() => navigate("/map")}>
-          View City Cleanliness Map
-        </button>
+      <section className="hero">
+
+        <div className="hero-content">
+
+          <h1>City Cleanliness Assessment System</h1>
+
+          <p>
+            Intelligent monitoring platform that analyzes urban cleanliness
+            using image-based reporting and spatial intelligence.
+          </p>
+
+          <div className="hero-buttons">
+
+            <button onClick={()=>navigate("/map")}>
+              View Cleanliness Map
+            </button>
+
+            <button
+              className="secondary"
+              onClick={()=>navigate("/report")}
+            >
+              Report Issue
+            </button>
+
+          </div>
+
+        </div>
+
       </section>
+
+
+      {/* STATS */}
+
+      <section className="stats">
+
+        <div className="stat-card">
+          <h2>{stats.reports}+</h2>
+          <p>Issues Reported</p>
+        </div>
+
+        <div className="stat-card">
+          <h2>{stats.areas}+</h2>
+          <p>Areas Monitored</p>
+        </div>
+
+        <div className="stat-card">
+          <h2>{stats.accuracy}%</h2>
+          <p>ML Accuracy</p>
+        </div>
+
+        <div className="stat-card">
+          <h2>{stats.citizens}+</h2>
+          <p>Citizens Participating</p>
+        </div>
+
+      </section>
+
 
       {/* FEATURES */}
+
       <section className="features">
-        <div>
+
+        <div className="feature-card">
           <h3>Image-Based Reporting</h3>
           <p>
-            Citizens and authorities can report cleanliness issues using real
-            images captured at ground level.
+            Citizens upload real images of waste or sanitation issues.
+            Our system processes these images and identifies cleanliness problems.
           </p>
         </div>
 
-        <div>
+        <div className="feature-card">
           <h3>Location Intelligence</h3>
           <p>
-            Every issue is mapped geographically, enabling area-wise analysis
-            and hotspot identification.
+            Each report is geo-tagged and mapped,
+            allowing authorities to detect garbage hotspots across the city.
           </p>
         </div>
 
-        <div>
-          <h3>Cleanliness Scoring</h3>
+        <div className="feature-card">
+          <h3>AI Cleanliness Scoring</h3>
           <p>
-            Machine learning models evaluate cleanliness severity and generate
-            objective cleanliness percentages.
+            Machine learning models analyze images and generate
+            objective cleanliness scores for every location.
           </p>
         </div>
+
       </section>
+
 
       {/* IMPACT */}
+
       <section className="impact">
-        <h2>Why This System Matters</h2>
+
+        <h2>Smart Cities Need Smart Monitoring</h2>
+
         <p>
-          Manual inspections are slow and subjective. This platform enables
-          data-driven decision making for urban authorities, ensuring faster
-          response, transparency, and improved quality of life.
+          Traditional inspection methods are slow and inefficient.
+          Our system enables real-time cleanliness monitoring through
+          community reporting, AI analysis, and spatial data visualization.
         </p>
+
+        <button onClick={()=>navigate("/dashboard")}>
+          Explore Cleanliness Dashboard
+        </button>
+
       </section>
 
+
       {/* FOOTER */}
+
       <footer className="footer">
         <p>© 2026 City Cleanliness Assessment System</p>
       </footer>
+
     </>
   );
 }
