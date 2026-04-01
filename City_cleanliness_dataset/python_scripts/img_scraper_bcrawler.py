@@ -60,25 +60,6 @@ keywords2 = [
     "rural sanitation india"
 ]
 
-<<<<<<< HEAD
-
-images_per_keyword = 200
-
-for keyword in keywords2:
-    folder_name = keyword.replace(" ", "_")
-    folder_path = os.path.join(dataset_dir, folder_name)
-
-    os.makedirs(folder_path, exist_ok=True)
-
-    print(f"Downloading: {keyword}")
-
-    crawler = BingImageCrawler(storage={'root_dir': folder_path})
-
-    crawler.crawl(
-        keyword=keyword,
-        max_num=images_per_keyword
-    )
-=======
 keys_main = [
     "plastic_waste",
     "paper_waste",
@@ -463,6 +444,5 @@ for key in tqdm(main_keys_keywords.keys(),desc="Main Keys"):
         )
     
     print(f"Download complete for key:{key}")
->>>>>>> 20a9bbaeda5940567666d88112ef952e2d210fa7
 
 print("Download complete.")
