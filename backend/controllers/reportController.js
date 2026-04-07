@@ -1,98 +1,100 @@
 const Report = require("../models/Report");
 const axios = require("axios");
-require("dotenv").config(); // 🔥 IMPORTANT
+const FormData = require("form-data");
 
-// ─── Convert image URL → base64 ─────────────────────────────
-async function imageUrlToBase64(url) {
-  const response = await axios.get(url, { responseType: "arraybuffer" });
+// 🔥 ML FUNCTION (FastAPI YOLO)
+async function scoreWithML(imageUrl) {
+  try {
+    console.log("📥 Downloading image from Cloudinary...");
 
-  const base64 = Buffer.from(response.data).toString("base64");
-  const mimeType = response.headers["content-type"] || "image/jpeg";
+    const response = await axios.get(imageUrl, {
+      responseType: "arraybuffer",
+    });
 
-  return { base64, mimeType };
+    const formData = new FormData();
+    formData.append("file", response.data, "image.jpg");
+
+    console.log("🚀 Sending image to ML server...");
+
+    const res = await axios.post(
+      "http://localhost:8000/predict/",
+      formData,
+      {
+        headers: formData.getHeaders(),
+      }
+    );
+
+    const score = res.data.cleanliness_score;
+
+    // 🔥 Convert ML → App format
+    let condition;
+    if (score >= 80) condition = "GOOD";
+    else if (score >= 50) condition = "MODERATE";
+    else condition = "BAD";
+
+    console.log("✅ ML RESPONSE:", res.data);
+
+    return {
+      mlScore: score,
+      condition: condition,
+      reason: res.data.severity || "AI detected issue",
+      imageAfter: res.data.image, // base64 processed image
+    };
+  } catch (err) {
+    console.error("❌ ML ERROR:", err.message);
+    throw err;
+  }
 }
 
-// ─── Gemini AI Scoring ─────────────────────────────────────
-async function scoreImageWithGemini(imageUrl) {
-  console.log("⚡ Using DUMMY scoring instead of Gemini");
-
-  // Generate random realistic score
-  const mlScore = Math.floor(Math.random() * 100);
-
-  let condition;
-  if (mlScore <= 40) condition = "BAD";
-  else if (mlScore <= 70) condition = "MODERATE";
-  else condition = "GOOD";
-
-  const reasons = {
-    BAD: [
-      "Heavy garbage accumulation visible",
-      "Open waste and poor sanitation",
-      "Severe littering detected",
-    ],
-    MODERATE: [
-      "Some litter present",
-      "Area needs cleaning attention",
-      "Moderate waste observed",
-    ],
-    GOOD: [
-      "Clean and well maintained area",
-      "No visible garbage",
-      "Properly maintained surroundings",
-    ],
-  };
-
-  const reason =
-    reasons[condition][
-      Math.floor(Math.random() * reasons[condition].length)
-    ];
-
-  return { mlScore, condition, reason };
-}
-
-// ─── CREATE REPORT ─────────────────────────────────────────
+// 🔥 CREATE REPORT
 const createReport = async (req, res) => {
   try {
-    const { latitude, longitude, username, email } = req.body;
+    const latitude = req.body.latitude;
+    const longitude = req.body.longitude;
+    const username = req.body.username || "Anonymous";
+    const email = req.body.email || "No Email";
 
-    console.log("📸 FILE RECEIVED:", req.file);
+    console.log("📦 BODY:", req.body);
+    console.log("📸 FILE:", req.file);
 
     const imageUrl = req.file?.path || req.file?.secure_url;
-
-    console.log("🌐 IMAGE URL:", imageUrl);
 
     if (!imageUrl) {
       return res.status(400).json({ message: "Image upload failed" });
     }
 
-    let mlScore, condition, reason;
+    console.log("🌐 IMAGE URL:", imageUrl);
+
+    let mlScore, condition, reason, imageAfter;
 
     try {
-      ({ mlScore, condition, reason } =
-        await scoreImageWithGemini(imageUrl));
-
-      console.log(
-        `✅ Dummy Score: ${mlScore} | ${condition} | ${reason}`
-      );
+      // 🔥 CALL ML MODEL
+      ({ mlScore, condition, reason, imageAfter } =
+        await scoreWithML(imageUrl));
     } catch (err) {
+      console.log("⚠️ ML failed → using fallback");
+
       mlScore = 50;
       condition = "MODERATE";
-      reason = "Fallback scoring used.";
+      reason = "Fallback scoring";
+      imageAfter = null;
     }
 
+    // 🔥 SAVE TO DB
     const report = await Report.create({
       imageBefore: imageUrl,
+      imageAfter,
       latitude: Number(latitude),
       longitude: Number(longitude),
       mlScore,
       condition,
       reason,
       status: "OPEN",
-
-      // 🔥 NEW FIELDS
       username,
-      email
+      email,
     });
+
+    console.log("✅ REPORT SAVED:", report._id);
 
     res.status(201).json(report);
   } catch (error) {
@@ -101,15 +103,17 @@ const createReport = async (req, res) => {
   }
 };
 
-// ─── GET ALL REPORTS ───────────────────────────────────────
-const getAllReports = async (req, res) => {
+// 🔥 GET ALL REPORTS
+const getReports = async (req, res) => {
   try {
     const reports = await Report.find().sort({ createdAt: -1 });
     res.json(reports);
   } catch (error) {
-    console.error("❌ FETCH ERROR:", error);
     res.status(500).json({ message: "Failed to fetch reports" });
   }
 };
 
-module.exports = { createReport, getAllReports };
+module.exports = {
+  createReport,
+  getReports,
+};
