@@ -48,16 +48,16 @@ function App() {
   );
 
   return (
-    <BrowserRouter>
-      <Navbar user={user} />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/map" element={<CityMap />} />
-        <Route path="/report" element={<Report />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </BrowserRouter>
+     <BrowserRouter>
+  <Navbar user={user} />
+  <Routes>
+    <Route path="/" element={<Home />} />
+    <Route path="/map" element={<CityMap />} />
+    <Route path="/report" element={<Report />} />
+    <Route path="/admin" element={<AdminDashboard />} />
+    <Route path="/dashboard" element={<Dashboard />} />
+  </Routes>
+</BrowserRouter>
   );
 }
 

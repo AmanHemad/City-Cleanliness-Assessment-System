@@ -1,6 +1,14 @@
-html, body {
+html, body, #root {
   margin: 0;
   padding: 0;
-  background: #ffffff;
-  
+  min-height: 100vh;
+  background-color: #060d1a; /* 🔥 DARK BACKGROUND */
+}
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+body {
+  margin: 0;
+  /* 🔥 SAME AS NAVBAR HEIGHT */
 }

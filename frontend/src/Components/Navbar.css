@@ -12,7 +12,9 @@
   --glow-cyan: rgba(56, 189, 248, 0.35);
   --glow-teal: rgba(52, 211, 153, 0.35);
 }
-
+body {
+  margin: 0;
+}
 /* ── Navbar Shell ──────────────────────────────── */
 .navbar {
   display: flex;

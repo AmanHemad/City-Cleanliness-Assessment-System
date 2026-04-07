@@ -8,6 +8,7 @@ import {
 } from "react-leaflet";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 /* Recenter helper */
@@ -30,23 +31,22 @@ const CityMap = () => {
 
   const navigate = useNavigate();
 
-  /* Fetch reports every 5 seconds */
+  /* Fetch reports */
   useEffect(() => {
     const fetchReports = () => {
       fetch("http://localhost:5000/api/report")
         .then((res) => res.json())
         .then((data) => {
+          console.log("REPORT DATA:", data); // 🔥 DEBUG
+
           setReports(data);
 
-          // Only center map once on first load
           if (!initialized && data.length > 0) {
             const latest = data[0];
-
             setMapCenter([
               Number(latest.latitude),
               Number(latest.longitude)
             ]);
-
             setInitialized(true);
           }
         })
@@ -59,35 +59,42 @@ const CityMap = () => {
     return () => clearInterval(interval);
   }, [initialized]);
 
-  /* Search location */
- const searchLocation = async () => {
-  if (!search) return;
+  /* 🔥 FORCE LEAFLET REFRESH AFTER DATA LOAD */
+  useEffect(() => {
+    setTimeout(() => {
+      window.dispatchEvent(new Event("resize"));
+    }, 300);
+  }, [reports]);
 
-  try {
-    const res = await fetch(
-      `https://photon.komoot.io/api/?q=${search}&limit=1`
-    );
+  /* Search */
+  const searchLocation = async () => {
+    if (!search) return;
 
-    const data = await res.json();
+    try {
+      const res = await fetch(
+        `https://photon.komoot.io/api/?q=${search}&limit=1`
+      );
 
-    if (!data.features.length) {
-      alert("Location not found");
-      return;
+      const data = await res.json();
+
+      if (!data.features.length) {
+        alert("Location not found");
+        return;
+      }
+
+      const place = data.features[0];
+
+      const lat = place.geometry.coordinates[1];
+      const lon = place.geometry.coordinates[0];
+
+      setMapCenter([lat, lon]);
+      setBoundary(null);
+    } catch (err) {
+      console.error(err);
     }
+  };
 
-    const place = data.features[0];
-
-    const lat = place.geometry.coordinates[1];
-    const lon = place.geometry.coordinates[0];
-
-    setMapCenter([lat, lon]);
-
-    setBoundary(null); // photon usually gives point only
-  } catch (err) {
-    console.error(err);
-  }
-};
-  /* Circle color */
+  /* Color */
   const getColor = (condition) => {
     if (condition === "BAD") return "red";
     if (condition === "MODERATE") return "orange";
@@ -96,8 +103,7 @@ const CityMap = () => {
 
   return (
     <div style={{ position: "relative" }}>
-
-      {/* SEARCH BAR */}
+      {/* SEARCH */}
       <div
         style={{
           position: "absolute",
@@ -109,34 +115,19 @@ const CityMap = () => {
         }}
       >
         <input
-  type="text"
-  placeholder="Search city, area, street..."
-  value={search}
-  onChange={(e) => setSearch(e.target.value)}
-  onKeyDown={(e) => {
-    if (e.key === "Enter") searchLocation();
-  }}
-  style={{
-    padding: "8px 12px",
-    borderRadius: "6px",
-    border: "1px solid #ccc",
-    width: "240px"
-  }}
-/>
-
-        <button
-          onClick={searchLocation}
+          type="text"
+          placeholder="Search location..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && searchLocation()}
           style={{
-            padding: "8px 12px",
-            background: "#1976d2",
-            color: "white",
-            border: "none",
+            padding: "8px",
             borderRadius: "6px",
-            cursor: "pointer"
+            border: "1px solid #ccc"
           }}
-        >
-          Search
-        </button>
+        />
+
+        <button onClick={searchLocation}>Search</button>
       </div>
 
       {/* REPORT BUTTON */}
@@ -147,16 +138,14 @@ const CityMap = () => {
           top: "20px",
           right: "20px",
           zIndex: 1000,
-          padding: "10px 16px",
-          backgroundColor: "#d32f2f",
+          padding: "10px",
+          background: "red",
           color: "white",
           border: "none",
-          borderRadius: "8px",
-          cursor: "pointer",
-          fontWeight: "bold"
+          borderRadius: "8px"
         }}
       >
-        🚨 Report an Issue
+        🚨 Report
       </button>
 
       {/* MAP */}
@@ -169,50 +158,52 @@ const CityMap = () => {
 
         <RecenterMap center={mapCenter} />
 
-        {/* SEARCH BOUNDARY */}
-        {boundary && (
-          <GeoJSON
-            data={boundary}
-            style={{
-              color: "#1976d2",
-              weight: 3,
-              dashArray: "6 6",
-              fillOpacity: 0.05
-            }}
-          />
-        )}
+        {/* REPORTS */}
+        {reports.map((report) => {
+          console.log("IMAGE URL:", report.imageBefore); // 🔥 DEBUG
 
-        {/* REPORT CIRCLES */}
-        {reports.map((report) => (
-          <Circle
-            key={report._id}
-            center={[
-              Number(report.latitude),
-              Number(report.longitude)
-            ]}
-            radius={30}
-            pathOptions={{ color: getColor(report.condition) }}
-          >
-            <Popup>
-              <div style={{ width: "200px" }}>
-                <img
-                  src={report.imageBefore}
-                  alt="road"
-                  style={{
-                    width: "100%",
-                    borderRadius: "8px",
-                    marginBottom: "8px"
-                  }}
-                />
+          return (
+            <Circle
+              key={report._id}
+              center={[
+                Number(report.latitude),
+                Number(report.longitude)
+              ]}
+              radius={30}
+              pathOptions={{ color: getColor(report.condition) }}
+            >
+              <Popup>
+  <div style={{ width: "220px", minHeight: "200px" }}>
+    
+    {report.imageBefore && (
+      <img
+        src={report.imageBefore}
+        alt="road"
+        onError={(e) => {
+          e.target.src = "https://via.placeholder.com/200";
+        }}
+        style={{
+          width: "100%",
+          height: "150px",
+          objectFit: "cover",
+          borderRadius: "8px",
+          marginBottom: "8px"
+        }}
+      />
+    )}
 
-                <p><b>Status:</b> {report.status}</p>
-                <p><b>Condition:</b> {report.condition}</p>
-                <p><b>Score:</b> {report.mlScore}</p>
-                <p><b>Reason:</b> {report.reason}</p>
-              </div>
-            </Popup>
-          </Circle>
-        ))}
+    {/* 🔥 NEW */}
+    <p><b>👤 Uploaded by:</b> {report.username || "Anonymous"}</p>
+
+    <p><b>Status:</b> {report.status}</p>
+    <p><b>Condition:</b> {report.condition}</p>
+    <p><b>Score:</b> {report.mlScore}</p>
+    <p><b>Reason:</b> {report.reason}</p>
+  </div>
+</Popup>
+            </Circle>
+          );
+        })}
       </MapContainer>
     </div>
   );
