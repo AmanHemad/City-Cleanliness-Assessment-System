@@ -1,126 +1,113 @@
 const Report = require("../models/Report");
 const axios = require("axios");
+require("dotenv").config(); // 🔥 IMPORTANT
 
-// ─── Fetch image from Cloudinary and convert to base64 ──────────────────────
+// ─── Convert image URL → base64 ─────────────────────────────
 async function imageUrlToBase64(url) {
   const response = await axios.get(url, { responseType: "arraybuffer" });
+
   const base64 = Buffer.from(response.data).toString("base64");
   const mimeType = response.headers["content-type"] || "image/jpeg";
+
   return { base64, mimeType };
 }
 
-// ─── Score image using Google Gemini (free tier) ─────────────────────────────
+// ─── Gemini AI Scoring ─────────────────────────────────────
 async function scoreImageWithGemini(imageUrl) {
-  const { base64, mimeType } = await imageUrlToBase64(imageUrl);
+  console.log("⚡ Using DUMMY scoring instead of Gemini");
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  // Generate random realistic score
+  const mlScore = Math.floor(Math.random() * 100);
 
-  const payload = {
-    contents: [
-      {
-        parts: [
-          {
-            inline_data: {
-              mime_type: mimeType,
-              data: base64,
-            },
-          },
-          {
-            text: `You are a city cleanliness inspector AI. Analyze this image and rate the cleanliness/garbage situation.
+  let condition;
+  if (mlScore <= 40) condition = "BAD";
+  else if (mlScore <= 70) condition = "MODERATE";
+  else condition = "GOOD";
 
-Reply with ONLY a valid JSON object in this exact format (no extra text, no markdown, no code blocks):
-{
-  "mlScore": <integer 0-100, where 0=extremely dirty, 100=perfectly clean>,
-  "condition": "<BAD|MODERATE|GOOD>",
-  "reason": "<one concise sentence explaining what you see>"
-}
-
-Scoring guide:
-- 0–40  -> BAD      (heavy garbage, open waste, severe littering)
-- 41–70 -> MODERATE (some litter, minor dumping, needs attention)
-- 71–100 -> GOOD    (clean, no visible garbage, well maintained)`,
-          },
-        ],
-      },
+  const reasons = {
+    BAD: [
+      "Heavy garbage accumulation visible",
+      "Open waste and poor sanitation",
+      "Severe littering detected",
     ],
-    generationConfig: {
-      temperature: 0.1,
-      maxOutputTokens: 150,
-    },
+    MODERATE: [
+      "Some litter present",
+      "Area needs cleaning attention",
+      "Moderate waste observed",
+    ],
+    GOOD: [
+      "Clean and well maintained area",
+      "No visible garbage",
+      "Properly maintained surroundings",
+    ],
   };
 
-  const response = await axios.post(endpoint, payload, {
-    headers: { "Content-Type": "application/json" },
-  });
-
-  // Extract text from Gemini response
-  const raw = response.data.candidates[0].content.parts[0].text.trim();
-
-  // Strip markdown code fences if Gemini wraps in ```json ... ```
-  const cleaned = raw.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
-
-  const parsed = JSON.parse(cleaned);
-
-  // Validate and clamp values
-  const mlScore = Math.min(100, Math.max(0, Number(parsed.mlScore)));
-  const condition = ["BAD", "MODERATE", "GOOD"].includes(parsed.condition)
-    ? parsed.condition
-    : mlScore > 70 ? "GOOD" : mlScore > 40 ? "MODERATE" : "BAD";
   const reason =
-    typeof parsed.reason === "string" && parsed.reason.length > 0
-      ? parsed.reason
-      : "Unable to determine reason.";
+    reasons[condition][
+      Math.floor(Math.random() * reasons[condition].length)
+    ];
 
   return { mlScore, condition, reason };
 }
 
-// ─── POST /api/report ────────────────────────────────────────────────────────
+// ─── CREATE REPORT ─────────────────────────────────────────
 const createReport = async (req, res) => {
   try {
-    const { latitude, longitude } = req.body;
+    const { latitude, longitude, username, email } = req.body;
 
-    if (!req.file) {
-      return res.status(400).json({ message: "Image is required" });
+    console.log("📸 FILE RECEIVED:", req.file);
+
+    const imageUrl = req.file?.path || req.file?.secure_url;
+
+    console.log("🌐 IMAGE URL:", imageUrl);
+
+    if (!imageUrl) {
+      return res.status(400).json({ message: "Image upload failed" });
     }
 
-    const imageUrl = req.file.path; // Cloudinary URL from multer-storage-cloudinary
-
-    // AI scoring with Gemini
     let mlScore, condition, reason;
+
     try {
-      ({ mlScore, condition, reason } = await scoreImageWithGemini(imageUrl));
-      console.log(`Gemini scored: ${mlScore} | ${condition} | ${reason}`);
-    } catch (aiErr) {
-      console.error("Gemini scoring failed, using fallback:", aiErr.message);
-      mlScore   = 50;
+      ({ mlScore, condition, reason } =
+        await scoreImageWithGemini(imageUrl));
+
+      console.log(
+        `✅ Dummy Score: ${mlScore} | ${condition} | ${reason}`
+      );
+    } catch (err) {
+      mlScore = 50;
       condition = "MODERATE";
-      reason    = "AI scoring unavailable — manual review needed.";
+      reason = "Fallback scoring used.";
     }
 
     const report = await Report.create({
       imageBefore: imageUrl,
-      latitude:    Number(latitude),
-      longitude:   Number(longitude),
+      latitude: Number(latitude),
+      longitude: Number(longitude),
       mlScore,
       condition,
       reason,
       status: "OPEN",
+
+      // 🔥 NEW FIELDS
+      username,
+      email
     });
 
     res.status(201).json(report);
   } catch (error) {
-    console.error(error);
+    console.error("❌ SERVER ERROR:", error);
     res.status(500).json({ message: "Failed to create report" });
   }
 };
 
-// ─── GET /api/report ─────────────────────────────────────────────────────────
+// ─── GET ALL REPORTS ───────────────────────────────────────
 const getAllReports = async (req, res) => {
   try {
     const reports = await Report.find().sort({ createdAt: -1 });
     res.json(reports);
   } catch (error) {
+    console.error("❌ FETCH ERROR:", error);
     res.status(500).json({ message: "Failed to fetch reports" });
   }
 };

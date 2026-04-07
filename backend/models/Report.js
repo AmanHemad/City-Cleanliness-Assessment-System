@@ -43,6 +43,13 @@ const reportSchema = new mongoose.Schema(
       enum: ["OPEN", "RESOLVED"],
       default: "OPEN",
     },
+     username: {
+    type: String,
+    default: "Anonymous"
+    },
+    email: {
+    type: String
+    }
   },
   { timestamps: true }
 );
