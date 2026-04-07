@@ -1,19 +1,152 @@
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase";
+import { useNavigate, useLocation } from "react-router-dom";
+import Login from "../pages/Login";
 import "./Navbar.css";
 
-function Navbar() {
+export default function Navbar({ user }) {
+  const [scrolled, setScrolled] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setDropdownOpen(false);
+      navigate("/");
+    } catch (err) {
+      console.error("Logout failed:", err.message);
+    }
+  };
+
+  const initials = user?.displayName
+    ? user.displayName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+    : user?.email?.[0]?.toUpperCase() ?? "?";
+
+  const displayName = user?.displayName ?? user?.email?.split("@")[0] ?? "User";
+  const displayEmail = user?.email ?? "";
+
+  const navItems = [
+    { label: "Home", path: "/" },
+    { label: "City Map", path: "/map" },
+    { label: "Dash Board", path: "/dashboard" },
+    
+  ];
 
   return (
-    <nav className="navbar">
-      <div className="nav-logo">CityClean</div>
-      <ul className="nav-links">
-        <li onClick={() => navigate("/")}>Home</li>
-        <li onClick={() => navigate("/map")}>City Map</li>
-        <li onClick={() => navigate("/dashboard")}>Dash Board</li>
-      </ul>
-    </nav>
+    <>
+      <nav className={`navbar${scrolled ? " navbar--scrolled" : ""}`}>
+        <div className="nav-logo" onClick={() => navigate("/")}>
+          CityClean
+        </div>
+
+        <div className="nav-right">
+          <ul className="nav-links">
+            {navItems.map(({ label, path }) => (
+              <li
+                key={path}
+                className={location.pathname === path ? "active" : ""}
+                onClick={() => navigate(path)}
+              >
+                {label}
+              </li>
+            ))}
+          </ul>
+
+          {user ? (
+            <div className="nav-user-wrapper" ref={dropdownRef}>
+              {/* Clickable avatar */}
+              <div
+                className="nav-user-trigger"
+                onClick={() => setDropdownOpen((v) => !v)}
+              >
+                {user.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt={displayName}
+                    className="nav-user-img"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="nav-user-avatar">{initials}</div>
+                )}
+                <span className="nav-username">{displayName}</span>
+                <span className="nav-chevron">{dropdownOpen ? "▲" : "▼"}</span>
+              </div>
+
+              {/* Dropdown */}
+              {dropdownOpen && (
+                <div className="nav-dropdown">
+                  {/* User info header */}
+                  <div className="nav-dropdown-header">
+                    {user.photoURL ? (
+                      <img
+                        src={user.photoURL}
+                        alt={displayName}
+                        className="nav-dropdown-avatar-img"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <div className="nav-dropdown-avatar">{initials}</div>
+                    )}
+                    <div className="nav-dropdown-info">
+                      <span className="nav-dropdown-name">{displayName}</span>
+                      <span className="nav-dropdown-email">{displayEmail}</span>
+                    </div>
+                  </div>
+
+                  <div className="nav-dropdown-divider" />
+
+                  {/* Account option */}
+                  <button
+                    className="nav-dropdown-item"
+                    onClick={() => { navigate("/dashboard"); setDropdownOpen(false); }}
+                  >
+                    <span>👤</span> My Account
+                  </button>
+
+                  <div className="nav-dropdown-divider" />
+
+                  {/* Logout */}
+                  <button
+                    className="nav-dropdown-item nav-dropdown-logout"
+                    onClick={handleLogout}
+                  >
+                    <span>🚪</span> Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button className="nav-login-btn" onClick={() => setLoginOpen(true)}>
+              Login
+            </button>
+          )}
+        </div>
+      </nav>
+
+      <Login isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
+    </>
   );
 }
-
-export default Navbar;
