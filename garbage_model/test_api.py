@@ -4,7 +4,7 @@ import base64
 url = "http://127.0.0.1:8000/predict/"
 
 # Image path
-image_path = "/home/venom/Documents/CSE/CSE_y3s2/Mini_Project/City-Cleanliness-Assessment-System/City_cleanliness_dataset/cleanliness_dataset/city_street_litter_india/000009.jpg"
+image_path = "/home/venom/Documents/CSE/CSE_y3s2/Mini_Project/City-Cleanliness-Assessment-System/City_cleanliness_dataset/cleanliness_dataset/city_street_litter_india/000005.jpg"
 
 # Send request
 with open(image_path, "rb") as f:
