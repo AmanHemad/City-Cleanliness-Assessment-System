@@ -8,17 +8,13 @@ import "./ReportIssue.css";
 const PENDING_KEY = "cityClean_pendingReport";
 
 async function savePendingImage(file) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      localStorage.setItem(
-        PENDING_KEY,
-        JSON.stringify({ name: file.name, type: file.type, data: reader.result })
-      );
-      resolve();
-    };
-    reader.readAsDataURL(file);
-  });
+  localStorage.setItem(
+    PENDING_KEY,
+    JSON.stringify({
+      name: file.name,
+      type: file.type,
+    })
+  );
 }
 
 function loadPendingImage() {
@@ -203,7 +199,16 @@ const handleSubmit = async () => {
           body: formData,
         });
 
-        const data = await res.json();
+        const text = await res.text();
+console.log("🔥 RAW SERVER RESPONSE:", text);
+
+let data;
+try {
+  data = JSON.parse(text);
+} catch (e) {
+  console.error("❌ BACKEND RETURNED HTML:", text);
+  throw new Error("Server crashed (check backend terminal)");
+}
         console.log("SERVER RESPONSE:", data);
 
         if (!res.ok) throw new Error("Upload failed");
