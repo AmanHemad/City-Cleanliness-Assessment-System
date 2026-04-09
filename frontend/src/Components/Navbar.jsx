@@ -41,17 +41,22 @@ export default function Navbar({ user }) {
   };
 
   const initials = user?.displayName
-    ? user.displayName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+    ? user.displayName
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
     : user?.email?.[0]?.toUpperCase() ?? "?";
 
-  const displayName = user?.displayName ?? user?.email?.split("@")[0] ?? "User";
+  const displayName =
+    user?.displayName ?? user?.email?.split("@")[0] ?? "User";
   const displayEmail = user?.email ?? "";
 
   const navItems = [
     { label: "Home", path: "/" },
     { label: "City Map", path: "/map" },
     { label: "Dash Board", path: "/dashboard" },
-    
   ];
 
   return (
@@ -62,6 +67,7 @@ export default function Navbar({ user }) {
         </div>
 
         <div className="nav-right">
+          {/* Navigation Links */}
           <ul className="nav-links">
             {navItems.map(({ label, path }) => (
               <li
@@ -74,75 +80,98 @@ export default function Navbar({ user }) {
             ))}
           </ul>
 
-          {user ? (
-            <div className="nav-user-wrapper" ref={dropdownRef}>
-              {/* Clickable avatar */}
-              <div
-                className="nav-user-trigger"
-                onClick={() => setDropdownOpen((v) => !v)}
-              >
-                {user.photoURL ? (
-                  <img
-                    src={user.photoURL}
-                    alt={displayName}
-                    className="nav-user-img"
-                    referrerPolicy="no-referrer"
-                  />
-                ) : (
-                  <div className="nav-user-avatar">{initials}</div>
-                )}
-                <span className="nav-username">{displayName}</span>
-                <span className="nav-chevron">{dropdownOpen ? "▲" : "▼"}</span>
-              </div>
-
-              {/* Dropdown */}
-              {dropdownOpen && (
-                <div className="nav-dropdown">
-                  {/* User info header */}
-                  <div className="nav-dropdown-header">
-                    {user.photoURL ? (
-                      <img
-                        src={user.photoURL}
-                        alt={displayName}
-                        className="nav-dropdown-avatar-img"
-                        referrerPolicy="no-referrer"
-                      />
-                    ) : (
-                      <div className="nav-dropdown-avatar">{initials}</div>
-                    )}
-                    <div className="nav-dropdown-info">
-                      <span className="nav-dropdown-name">{displayName}</span>
-                      <span className="nav-dropdown-email">{displayEmail}</span>
-                    </div>
-                  </div>
-
-                  <div className="nav-dropdown-divider" />
-
-                  {/* Account option */}
-                  <button
-                    className="nav-dropdown-item"
-                    onClick={() => { navigate("/dashboard"); setDropdownOpen(false); }}
-                  >
-                    <span>👤</span> My Account
-                  </button>
-
-                  <div className="nav-dropdown-divider" />
-
-                  {/* Logout */}
-                  <button
-                    className="nav-dropdown-item nav-dropdown-logout"
-                    onClick={handleLogout}
-                  >
-                    <span>🚪</span> Logout
-                  </button>
+          {/* Right Side Buttons */}
+          <div style={{ display: "flex", alignItems: "center" }}>
+            
+            {/* Login OR User */}
+            {user ? (
+              <div className="nav-user-wrapper" ref={dropdownRef}>
+                <div
+                  className="nav-user-trigger"
+                  onClick={() => setDropdownOpen((v) => !v)}
+                >
+                  {user.photoURL ? (
+                    <img
+                      src={user.photoURL}
+                      alt={displayName}
+                      className="nav-user-img"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="nav-user-avatar">{initials}</div>
+                  )}
+                  <span className="nav-username">{displayName}</span>
+                  <span className="nav-chevron">
+                    {dropdownOpen ? "▲" : "▼"}
+                  </span>
                 </div>
-              )}
-            </div>
-          ) : (
-            <button className="nav-login-btn" onClick={() => setLoginOpen(true)}>
-              Login
+
+                {/* Dropdown */}
+                {dropdownOpen && (
+                  <div className="nav-dropdown">
+                    <div className="nav-dropdown-header">
+                      {user.photoURL ? (
+                        <img
+                          src={user.photoURL}
+                          alt={displayName}
+                          className="nav-dropdown-avatar-img"
+                        />
+                      ) : (
+                        <div className="nav-dropdown-avatar">
+                          {initials}
+                        </div>
+                      )}
+                      <div className="nav-dropdown-info">
+                        <span className="nav-dropdown-name">
+                          {displayName}
+                        </span>
+                        <span className="nav-dropdown-email">
+                          {displayEmail}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="nav-dropdown-divider" />
+
+                    <button
+                      className="nav-dropdown-item"
+                      onClick={() => {
+                        navigate("/dashboard");
+                        setDropdownOpen(false);
+                      }}
+                    >
+                      👤 My Account
+                    </button>
+
+                    <div className="nav-dropdown-divider" />
+
+                    <button
+                      className="nav-dropdown-item nav-dropdown-logout"
+                      onClick={handleLogout}
+                    >
+                      🚪 Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                className="nav-login-btn"
+                onClick={() => setLoginOpen(true)}
+              >
+                Login
+              </button>
+            )}
+
+            {/* ✅ ADMIN BUTTON */}
+            <button
+              className="nav-admin-btn"
+              onClick={() => navigate("/admin-login")}
+            >
+              Admin
             </button>
-          )}
+
+          </div>
         </div>
       </nav>
 
