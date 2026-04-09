@@ -38,7 +38,7 @@ app.use((err, req, res, next) => {
 app.use("/api", require("./routes/reportRoutes"));
 // 📦 Routes
 app.use("/api", require("./routes/reportRoutes")); // existing routes
-app.use("/api/admin", require("./routes/adminRoutes")); // ✅ admin routes
+app.use("/api/admin", require("./routes/AdminRoutes")); // ✅ admin routes
 
 // ❌ REMOVE duplicate dashboard route (IMPORTANT)
 
