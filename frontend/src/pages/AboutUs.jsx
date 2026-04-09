@@ -59,6 +59,46 @@ export default function AboutUs() {
           </div>
         </div>
 
+        {/* TEAM SECTION */}
+        <div className="about-section full-width team-section">
+          <h2>👥 Meet Our Team</h2>
+          <div className="team-grid">
+            
+            <div className="team-card">
+              <img src="/images/aman.jpg" alt="K. Aman" className="team-avatar-real" style={{ objectPosition: "center 15%" }} />
+              <div className="team-info">
+                <h3>K. Aman</h3>
+                <h4>Project Lead / Backend Developer</h4>
+              </div>
+            </div>
+
+            <div className="team-card">
+              <img src="/images/vardhan.jpg" alt="A. Vardhan" className="team-avatar-real" style={{ objectPosition: "top" }} />
+              <div className="team-info">
+                <h3>A. Vardhan</h3>
+                <h4>ML and CV Engineer</h4>
+              </div>
+            </div>
+
+            <div className="team-card">
+              <img src="/images/afreen.jpg" alt="Sk. Afreen" className="team-avatar-real" />
+              <div className="team-info">
+                <h3>Sk. Afreen</h3>
+                <h4>Frontend Developer</h4>
+              </div>
+            </div>
+
+            <div className="team-card">
+              <img src="/images/mallika.jpg" alt="M. Malleeswari" className="team-avatar-real" />
+              <div className="team-info">
+                <h3>M. Malleeswari</h3>
+                <h4>Data & Testing</h4>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </div>
   );

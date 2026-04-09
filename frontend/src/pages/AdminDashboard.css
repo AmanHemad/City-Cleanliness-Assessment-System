@@ -1,0 +1,186 @@
+.admin-container {
+  min-height: 100vh;
+  background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(79, 70, 229, 0.15) 0%, transparent 70%), #060d1a;
+  padding: 80px 24px 60px;
+  font-family: 'DM Sans', sans-serif;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.admin-header {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 60px;
+  animation: fadeUp 0.8s ease both;
+}
+
+.admin-title {
+  font-family: "Syne", sans-serif;
+  font-size: clamp(32px, 5vw, 42px);
+  font-weight: 800;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #ffffff 0%, #93c5fd 50%, #6ee7b7 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  width: 100%;
+  max-width: 1000px;
+  margin-bottom: 50px;
+  animation: fadeUp 1s ease both;
+}
+
+.admin-stat-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 30px 24px;
+  text-align: left;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.admin-stat-card.blue::before { background: linear-gradient(to bottom, #3b82f6, #60a5fa); }
+.admin-stat-card.red::before { background: linear-gradient(to bottom, #ef4444, #f87171); }
+.admin-stat-card.orange::before { background: linear-gradient(to bottom, #f97316, #fb923c); }
+.admin-stat-card.green::before { background: linear-gradient(to bottom, #10b981, #34d399); }
+
+.admin-stat-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.admin-stat-card h3 {
+  margin: 0 0 12px 0;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.admin-stat-card p {
+  margin: 0;
+  font-size: 2.8rem;
+  font-family: "Syne", sans-serif;
+  font-weight: 800;
+  color: #f1f5f9;
+}
+
+.admin-account-section {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(6, 182, 212, 0.05));
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  padding: 30px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  animation: fadeUp 1.2s ease both;
+}
+
+.admin-account-section h2 {
+  font-family: "Syne", sans-serif;
+  font-size: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #e2e8f0;
+}
+
+.admin-info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.admin-info-row:last-child {
+  border-bottom: none;
+}
+
+.admin-info-label {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.admin-info-value {
+  color: #f8fafc;
+  font-weight: 600;
+}
+
+.admin-info-value.id-text {
+  font-family: monospace;
+  color: #64748b;
+  font-weight: normal;
+  font-size: 0.9rem;
+}
+
+.admin-actions {
+  margin-top: 40px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: fadeUp 1.4s ease both;
+}
+
+.admin-btn {
+  padding: 14px 28px;
+  font-size: 15px;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-btn.primary {
+  background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+  color: white;
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+}
+
+.admin-btn.primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.5);
+}
+
+.admin-btn.danger {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+.admin-btn.danger:hover {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
