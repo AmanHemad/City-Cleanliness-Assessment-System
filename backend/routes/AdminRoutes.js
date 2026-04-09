@@ -7,7 +7,7 @@ const adminAuth = require("../Middleware/AdminMiddleware"); // ✅ IMPORT MIDDLE
 const router = express.Router();
 
 // 🔐 ENV VARIABLES
-const ADMIN_SECRET = process.env.ADMIN_SECRET || "ADMIN123";
+const ADMIN_SECRET = process.env.ADMIN_SECRET_CODE || "ADMIN123";
 const JWT_SECRET = process.env.JWT_SECRET || "SECRET_KEY";
 
 
@@ -102,9 +102,10 @@ router.post("/login", async (req, res) => {
 // ==============================
 router.get("/dashboard", adminAuth, async (req, res) => {
   try {
+    const adminDetails = await Admin.findById(req.admin.id).select("-password");
     res.json({
       message: "Welcome Admin 🎉",
-      admin: req.admin
+      admin: adminDetails
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
