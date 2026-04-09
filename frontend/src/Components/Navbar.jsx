@@ -9,7 +9,9 @@ export default function Navbar({ user }) {
   const [scrolled, setScrolled] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const loginDropdownRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -24,6 +26,9 @@ export default function Navbar({ user }) {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setDropdownOpen(false);
+      }
+      if (loginDropdownRef.current && !loginDropdownRef.current.contains(e.target)) {
+        setLoginDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -85,8 +90,8 @@ export default function Navbar({ user }) {
           {/* Right Side Buttons */}
           <div style={{ display: "flex", alignItems: "center" }}>
             
-            {/* Login OR User */}
-            {user ? (
+            {/* If USER is logged in */}
+            {user && (
               <div className="nav-user-wrapper" ref={dropdownRef}>
                 <div
                   className="nav-user-trigger"
@@ -156,47 +161,60 @@ export default function Navbar({ user }) {
                   </div>
                 )}
               </div>
-            ) : (
-              <button
-                className="nav-login-btn"
-                onClick={() => setLoginOpen(true)}
-              >
-                Login
-              </button>
             )}
 
-            {/* ✅ ADMIN BUTTONS (Hide completely if a normal user is logged in) */}
-            {!user && (
-              <>
-                {localStorage.getItem("adminToken") ? (
-                  <div style={{ display: "flex", gap: "8px" }}>
+            {/* If NO USER and NO ADMIN are logged in */}
+            {!user && !localStorage.getItem("adminToken") && (
+              <div className="nav-user-wrapper" ref={loginDropdownRef}>
+                <button
+                  className="nav-login-btn"
+                  onClick={() => setLoginDropdownOpen(!loginDropdownOpen)}
+                  style={{ display: "flex", alignItems: "center", gap: "6px" }}
+                >
+                  Login <span style={{ fontSize: "10px" }}>{loginDropdownOpen ? "▲" : "▼"}</span>
+                </button>
+
+                {loginDropdownOpen && (
+                  <div className="nav-dropdown" style={{ minWidth: "180px", right: 0 }}>
                     <button
-                      className="nav-admin-btn"
-                      style={{ background: "#4f46e5", color: "white" }}
-                      onClick={() => navigate("/admin-dashboard")}
+                      className="nav-dropdown-item"
+                      onClick={() => { setLoginOpen(true); setLoginDropdownOpen(false); }}
                     >
-                      Admin Panel
+                      🚶‍♂️ Citizen Login
                     </button>
+                    <div className="nav-dropdown-divider" />
                     <button
-                      className="nav-admin-btn"
-                      style={{ background: "#ef4444", color: "white", padding: "6px 12px" }}
-                      onClick={() => {
-                        localStorage.removeItem("adminToken");
-                        window.location.reload();
-                      }}
+                      className="nav-dropdown-item"
+                      onClick={() => { navigate("/admin-login"); setLoginDropdownOpen(false); }}
                     >
-                      Admin Logout
+                      🛡️ Admin Access
                     </button>
                   </div>
-                ) : (
-                  <button
-                    className="nav-admin-btn"
-                    onClick={() => navigate("/admin-login")}
-                  >
-                    Admin Login
-                  </button>
                 )}
-              </>
+              </div>
+            )}
+
+            {/* If ADMIN is logged in but NO USER */}
+            {!user && localStorage.getItem("adminToken") && (
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button
+                  className="nav-admin-btn"
+                  style={{ background: "#4f46e5", color: "white" }}
+                  onClick={() => navigate("/admin-dashboard")}
+                >
+                  ⚙️ Admin Panel
+                </button>
+                <button
+                  className="nav-admin-btn"
+                  style={{ background: "rgba(239, 68, 68, 0.1)", color: "#fca5a5" }}
+                  onClick={() => {
+                    localStorage.removeItem("adminToken");
+                    window.location.reload();
+                  }}
+                >
+                  🚪 Logout
+                </button>
+              </div>
             )}
 
           </div>
