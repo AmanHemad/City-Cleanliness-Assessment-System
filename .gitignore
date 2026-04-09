@@ -2,3 +2,8 @@ cleanliness_dataset/
 model_env/
 clean_dataset/
 exp_data/
+__pycache__/
+*.pyc
+venv/
+.vscode/
+.venv/
