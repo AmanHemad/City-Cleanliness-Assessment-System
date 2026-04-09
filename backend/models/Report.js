@@ -57,6 +57,35 @@ const reportSchema = new mongoose.Schema(
     email: {
       type: String,
     },
+    assignedContractor: {
+  type: String,
+  default: null,
+},
+
+contractorStatus: {
+  type: String,
+  enum: ["PENDING", "IN_PROGRESS", "COMPLETED"],
+  default: "PENDING",
+},
+
+resolvedAt: {
+  type: Date,
+  default: null,
+},
+resolvedImage: {
+  type: String,
+  default: null,
+},
+
+resolvedML: {
+  type: String,
+  default: null,
+},
+
+userConfirmed: {
+  type: Boolean,
+  default: false,
+},
   },
   { timestamps: true }
 );

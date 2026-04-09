@@ -8,6 +8,7 @@ import Home from "./pages/home";
 import CityMap from "./pages/CityMap";
 import Report from "./pages/ReportIssue";
 import Dashboard from "./pages/Dashboard";
+import AboutUs from "./pages/AboutUs";
 
 import AdminLogin from "./pages/AdminLogin";
 import AdminRegister from "./pages/AdminRegister";
@@ -50,6 +51,7 @@ function App() {
         <Route path="/map" element={<CityMap />} />
         <Route path="/report" element={<Report />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/about" element={<AboutUs />} />
 
         {/* Admin routes */}
         <Route path="/admin-login" element={<AdminLogin />} />

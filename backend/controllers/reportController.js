@@ -71,7 +71,139 @@ async function scoreWithML(imageUrl) {
     };
   }
 }
+const assignContractor = async (req, res) => {
+  try {
+    const { reportId, contractorName } = req.body;
 
+    const report = await Report.findById(reportId);
+
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    report.assignedContractor = contractorName;
+    report.contractorStatus = "IN_PROGRESS";
+
+    await report.save();
+
+    res.json({ message: "Contractor assigned ✅", report });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+const uploadAfterImage = async (req, res) => {
+  try {
+    const { reportId } = req.body;
+
+    const report = await Report.findById(reportId);
+
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    const imageUrl = req.file?.path;
+
+    if (!imageUrl) {
+      return res.status(400).json({ message: "Image missing" });
+    }
+
+    // 🔥 Run ML again
+    const { mlScore, condition, reason } =
+      await scoreWithML(imageUrl);
+
+    report.imageAfter = imageUrl;
+    report.mlScore = mlScore;
+    report.condition = condition;
+    report.reason = reason;
+    report.contractorStatus = "COMPLETED";
+
+    await report.save();
+
+    res.json({ message: "After image uploaded ✅", report });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+const uploadResolvedImage = async (req, res) => {
+  try {
+    if (!req.admin || req.admin.role !== "admin") {
+      return res.status(403).json({ message: "Admin only ❌" });
+    }
+
+    const { reportId } = req.body;
+
+    const report = await Report.findById(reportId);
+    if (!report) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
+    const imageUrl = req.file?.path;
+    if (!imageUrl) {
+      return res.status(400).json({ message: "Image missing" });
+    }
+
+    const { mlScore, condition, reason, imageML } =
+      await scoreWithML(imageUrl);
+
+    report.imageAfter = imageUrl;
+    report.resolvedML = imageML;
+    report.mlScore = mlScore;
+    report.condition = condition;
+    report.reason = reason;
+
+    await report.save();
+
+    res.json({ message: "Resolved image uploaded ✅", report });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+const confirmResolution = async (req, res) => {
+  try {
+    const { reportId } = req.body;
+
+    const report = await Report.findById(reportId);
+
+    if (!report) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
+    report.userConfirmed = true;
+    report.status = "RESOLVED";
+
+    await report.save();
+
+    res.json({ message: "User confirmed ✅" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+
+const resolveReport = async (req, res) => {
+  try {
+    const { reportId } = req.body;
+
+    const report = await Report.findById(reportId);
+    if (!req.admin || req.admin.role !== "admin") {
+  return res.status(403).json({ message: "Admin only ❌" });
+}
+    if (!report) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
+    report.status = "RESOLVED";
+    report.resolvedAt = new Date();
+
+    await report.save();
+
+    res.json({ message: "Resolved ✅" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 // 🔥 CREATE REPORT
 const createReport = async (req, res) => {
   try {
@@ -136,7 +268,13 @@ const getReports = async (req, res) => {
   }
 };
 
+
 module.exports = {
   createReport,
   getReports,
+  assignContractor,
+  uploadAfterImage,
+  resolveReport,
+  uploadResolvedImage,   // ✅ MUST BE HERE
+  confirmResolution      // ✅ MUST BE HERE
 };

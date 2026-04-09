@@ -57,6 +57,7 @@ export default function Navbar({ user }) {
     { label: "Home", path: "/" },
     { label: "City Map", path: "/map" },
     { label: "Dash Board", path: "/dashboard" },
+    { label: "About Us", path: "/about"}
   ];
 
   return (
@@ -163,13 +164,39 @@ export default function Navbar({ user }) {
               </button>
             )}
 
-            {/* ✅ ADMIN BUTTON */}
-            <button
-              className="nav-admin-btn"
-              onClick={() => navigate("/admin-login")}
-            >
-              Admin
-            </button>
+            {/* ✅ ADMIN BUTTONS (Hide completely if a normal user is logged in) */}
+            {!user && (
+              <>
+                {localStorage.getItem("adminToken") ? (
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button
+                      className="nav-admin-btn"
+                      style={{ background: "#4f46e5", color: "white" }}
+                      onClick={() => navigate("/admin-dashboard")}
+                    >
+                      Admin Panel
+                    </button>
+                    <button
+                      className="nav-admin-btn"
+                      style={{ background: "#ef4444", color: "white", padding: "6px 12px" }}
+                      onClick={() => {
+                        localStorage.removeItem("adminToken");
+                        window.location.reload();
+                      }}
+                    >
+                      Admin Logout
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    className="nav-admin-btn"
+                    onClick={() => navigate("/admin-login")}
+                  >
+                    Admin Login
+                  </button>
+                )}
+              </>
+            )}
 
           </div>
         </div>
