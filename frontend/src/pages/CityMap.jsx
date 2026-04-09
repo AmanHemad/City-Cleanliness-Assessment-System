@@ -435,8 +435,13 @@ const CityMap = () => {
                               type="file"
                               disabled={uploadingReportId === report._id}
                               onChange={(e) => {
-                                if (e.target.files[0]) {
-                                  uploadResolved(report._id, e.target.files[0]);
+                                const file = e.target.files[0];
+                                if (file) {
+                                  if (file.size > 5 * 1024 * 1024) {
+                                    alert("❌ Image is too large! Please upload a photo under 5MB.");
+                                    return;
+                                  }
+                                  uploadResolved(report._id, file);
                                 }
                               }}
                             />

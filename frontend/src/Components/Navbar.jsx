@@ -57,6 +57,7 @@ export default function Navbar({ user }) {
     { label: "Home", path: "/" },
     { label: "City Map", path: "/map" },
     { label: "Dash Board", path: "/dashboard" },
+    { label: "Report Issue", path: "/report" },
     { label: "About Us", path: "/about"}
   ];
 

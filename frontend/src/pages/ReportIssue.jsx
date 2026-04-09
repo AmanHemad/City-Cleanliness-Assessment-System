@@ -127,9 +127,15 @@ export default function ReportIssue() {
 
   console.log("Selected file:", file);
 
-  // ✅ validate file
+  // ✅ validate file type
   if (!file.type.startsWith("image/")) {
     setStatus("❌ Please upload a valid image file.");
+    return;
+  }
+
+  // ✅ validate file size (Limit to 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    setStatus("❌ Image is too large! Please select an image under 5MB.");
     return;
   }
 

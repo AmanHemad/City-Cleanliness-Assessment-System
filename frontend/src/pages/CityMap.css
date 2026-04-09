@@ -6,13 +6,14 @@
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   padding: 0;
-  overflow: hidden;
+  overflow: visible !important;
 }
 
 .leaflet-popup-content {
   margin: 0;
   width: 420px !important;
   max-width: 90vw !important;
+  overflow: visible !important;
 }
 
 .popup-container {
@@ -82,10 +83,14 @@
 
 .image-card {
   position: relative;
-  background: #f3f4f6;
+  background: #000;
   border-radius: 8px;
-  overflow: hidden;
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+  z-index: 1;
+}
+
+.image-card:hover {
+  z-index: 1000;
 }
 
 .image-card img {
@@ -93,6 +98,16 @@
   height: 120px;
   object-fit: cover;
   display: block;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.image-card:hover img {
+  transform: scale(1.8);
+  object-fit: contain;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.95);
+  border: 2px solid #38bdf8;
 }
 
 .image-label {
