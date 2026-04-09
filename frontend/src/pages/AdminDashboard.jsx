@@ -1,51 +1,60 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const AdminDashboard = () => {
-  const [reports, setReports] = useState([]);
-
-  const fetchReports = async () => {
-    const res = await fetch("http://localhost:5000/api/reports");
-    const data = await res.json();
-    setReports(data.filter(r => r.status === "OPEN"));
-  };
+export default function AdminDashboard() {
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchReports();
-  }, []);
+    const checkAdmin = async () => {
+      try {
+        const token = localStorage.getItem("adminToken");
 
-  const resolveIssue = async (id, image) => {
-    const formData = new FormData();
-    formData.append("image", image);
+        // ❌ No token → redirect
+        if (!token) {
+          navigate("/admin-login");
+          return;
+        }
 
-    await fetch(`http://localhost:5000/api/report/${id}/resolve`, {
-      method: "POST",
-      body: formData,
-    });
+        // ✅ Verify token with backend
+        await axios.get("http://localhost:5000/api/admin/dashboard", {
+          headers: {
+            Authorization: `Bearer ${token}`, // ✅ FIXED (important)
+          },
+        });
 
-    fetchReports(); // refresh
-  };
+      } catch (err) {
+        console.error(err);
+        alert("Access Denied ❌");
+        navigate("/admin-login");
+      }
+    };
+
+    checkAdmin();
+  }, [navigate]);
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>🛠 Admin Dashboard</h2>
+    <div style={{ padding: "40px" }}>
+      <h1>Admin Dashboard 🛠️</h1>
+      <p>Welcome Admin 🚀</p>
 
-      {reports.map((r) => (
-        <div key={r._id} style={{ marginBottom: "20px" }}>
-          <p><b>Reason:</b> {r.reason}</p>
-          <img
-            src={`http://localhost:5000/uploads/${r.imageBefore}`}
-            alt="Before"
-            width="200"
-          />
-          <br />
-          <input
-            type="file"
-            onChange={(e) => resolveIssue(r._id, e.target.files[0])}
-          />
-        </div>
-      ))}
+      <button
+        onClick={() => {
+          localStorage.removeItem("adminToken");
+          navigate("/admin-login");
+        }}
+        style={{
+          marginTop: "20px",
+          padding: "8px 16px",
+          background: "#ff4d4d",
+          color: "#fff",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+        }}
+      >
+        Logout
+      </button>
     </div>
   );
-};
-
-export default AdminDashboard;
+}
