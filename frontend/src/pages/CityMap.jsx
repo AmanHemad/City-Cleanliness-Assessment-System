@@ -180,20 +180,31 @@ const CityMap = () => {
       <Popup>
         <div style={{ width: "220px", minHeight: "200px" }}>
           {report.imageBefore && (
-            <img
-              src={report.imageBefore}
-              alt="road"
-              onError={(e) => {
-                e.target.src = "https://via.placeholder.com/200";
-              }}
-              style={{
-                width: "100%",
-                height: "150px",
-                objectFit: "cover",
-                borderRadius: "8px",
-                marginBottom: "8px"
-              }}
-            />
+            <div style={{ display: "flex", gap: "10px" }}>
+  
+  {/* BEFORE */}
+  <div>
+    <p style={{ fontSize: "12px" }}>Before</p>
+    <img src={report.imageBefore} style={{ width: "100px" }} />
+  </div>
+
+  {/* ML */}
+  {report.imageML && (
+    <div>
+      <p style={{ fontSize: "12px" }}>AI</p>
+      <img src={report.imageML} style={{ width: "100px", border: "2px solid yellow" }} />
+    </div>
+  )}
+
+  {/* AFTER */}
+  {report.imageAfter && (
+    <div>
+      <p style={{ fontSize: "12px" }}>After</p>
+      <img src={report.imageAfter} style={{ width: "100px", border: "2px solid green" }} />
+    </div>
+  )}
+
+</div>
           )}
           <p><b>👤 Uploaded by:</b> {report.username || "Anonymous"}</p>
           <p><b>Status:</b> {report.status}</p>

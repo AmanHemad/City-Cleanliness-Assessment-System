@@ -7,8 +7,13 @@ const reportSchema = new mongoose.Schema(
       required: true,
     },
 
+    imageML: {
+      type: String, // 🔥 ML processed image
+      default: null,
+    },
+
     imageAfter: {
-      type: String,
+      type: String, // 🔥 Admin resolved image
       default: null,
     },
 
@@ -43,16 +48,15 @@ const reportSchema = new mongoose.Schema(
       enum: ["OPEN", "RESOLVED"],
       default: "OPEN",
     },
-     username: {
-    type: String,
-    default: "Anonymous"
+
+    username: {
+      type: String,
+      default: "Anonymous",
     },
+
     email: {
-    type: String
+      type: String,
     },
-    imageAfter: {
-  type: String
-    }
   },
   { timestamps: true }
 );
