@@ -49,6 +49,9 @@ const reportSchema = new mongoose.Schema(
     },
     email: {
     type: String
+    },
+    imageAfter: {
+  type: String
     }
   },
   { timestamps: true }

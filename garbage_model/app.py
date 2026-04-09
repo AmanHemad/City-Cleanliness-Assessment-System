@@ -166,6 +166,7 @@ async def predict(file: UploadFile = File(...)):
         # Encode image
         _, buffer = cv2.imencode(".jpg", img)
         img_base64 = base64.b64encode(buffer).decode("utf-8")
+        print("model successfully predicted",cleanliness_score,condition,box_count)
 
         return {
             "image": img_base64,

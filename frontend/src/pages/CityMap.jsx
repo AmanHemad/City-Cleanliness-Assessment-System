@@ -177,19 +177,19 @@ const CityMap = () => {
     
     {report.imageBefore && (
       <img
-        src={report.imageBefore}
-        alt="road"
-        onError={(e) => {
-          e.target.src = "https://via.placeholder.com/200";
-        }}
-        style={{
-          width: "100%",
-          height: "150px",
-          objectFit: "cover",
-          borderRadius: "8px",
-          marginBottom: "8px"
-        }}
-      />
+  src={
+    report.imageAfter
+      ? `data:image/jpeg;base64,${report.imageAfter}`
+      : report.imageBefore
+  }
+  alt="road"
+  style={{
+    width: "100%",
+    height: "150px",
+    objectFit: "cover",
+    borderRadius: "8px"
+  }}
+/>
     )}
 
     {/* 🔥 NEW */}
