@@ -4,10 +4,10 @@ const router = express.Router();
 const upload = require("../config/multer");
 const {
   createReport,
-  getAllReports,
+  getReports,
 } = require("../controllers/reportController");
 
 router.post("/report", upload.single("image"), createReport);
-router.get("/report", getAllReports);
+router.get("/report", getReports);
 
 module.exports = router;
