@@ -159,51 +159,52 @@ const CityMap = () => {
         <RecenterMap center={mapCenter} />
 
         {/* REPORTS */}
-        {reports.map((report) => {
-          console.log("IMAGE URL:", report.imageBefore); // 🔥 DEBUG
-
-          return (
-            <Circle
-              key={report._id}
-              center={[
-                Number(report.latitude),
-                Number(report.longitude)
-              ]}
-              radius={30}
-              pathOptions={{ color: getColor(report.condition) }}
-            >
-              <Popup>
-  <div style={{ width: "220px", minHeight: "200px" }}>
-    
-    {report.imageBefore && (
-      <img
-        src={report.imageBefore}
-        alt="road"
-        onError={(e) => {
-          e.target.src = "https://via.placeholder.com/200";
-        }}
-        style={{
-          width: "100%",
-          height: "150px",
-          objectFit: "cover",
-          borderRadius: "8px",
-          marginBottom: "8px"
-        }}
-      />
-    )}
-
-    {/* 🔥 NEW */}
-    <p><b>👤 Uploaded by:</b> {report.username || "Anonymous"}</p>
-
-    <p><b>Status:</b> {report.status}</p>
-    <p><b>Condition:</b> {report.condition}</p>
-    <p><b>Score:</b> {report.mlScore}</p>
-    <p><b>Reason:</b> {report.reason}</p>
-  </div>
-</Popup>
-            </Circle>
-          );
-        })}
+       {reports.map((report, index) => {
+  const offset = index * 0.00003; // small offset for overlapping points
+  return (
+    <Circle
+      key={report._id}
+      center={[
+        Number(report.latitude) + offset,
+        Number(report.longitude) + offset
+      ]}
+      radius={30}
+      pathOptions={{
+        color: getColor(report.condition),
+        weight: 3,
+        fillColor: getColor(report.condition),
+        fillOpacity: 0.15,
+        opacity: 1
+      }}
+    >
+      <Popup>
+        <div style={{ width: "220px", minHeight: "200px" }}>
+          {report.imageBefore && (
+            <img
+              src={report.imageBefore}
+              alt="road"
+              onError={(e) => {
+                e.target.src = "https://via.placeholder.com/200";
+              }}
+              style={{
+                width: "100%",
+                height: "150px",
+                objectFit: "cover",
+                borderRadius: "8px",
+                marginBottom: "8px"
+              }}
+            />
+          )}
+          <p><b>👤 Uploaded by:</b> {report.username || "Anonymous"}</p>
+          <p><b>Status:</b> {report.status}</p>
+          <p><b>Condition:</b> {report.condition}</p>
+          <p><b>Score:</b> {report.mlScore}</p>
+          <p><b>Reason:</b> {report.reason}</p>
+        </div>
+      </Popup>
+    </Circle>
+  );
+})}
       </MapContainer>
     </div>
   );
