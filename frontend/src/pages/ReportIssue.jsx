@@ -133,9 +133,9 @@ export default function ReportIssue() {
     return;
   }
 
-  // ✅ validate file size (Limit to 5MB)
-  if (file.size > 5 * 1024 * 1024) {
-    setStatus("❌ Image is too large! Please select an image under 5MB.");
+  // ✅ validate file size (Limit to 10MB)
+  if (file.size > 10 * 1024 * 1024) {
+    setStatus("❌ Image is too large! Please select an image under 10MB.");
     return;
   }
 
