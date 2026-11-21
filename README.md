@@ -1,5 +1,11 @@
 # City Cleanliness Assessment System
 
+## 🌐 Live Demo
+- **Live Website:** [https://smart-city-clean.vercel.app/](https://smart-city-clean.vercel.app/)
+- **Backend API:** [https://city-cleanliness-assessment-system.onrender.com](https://city-cleanliness-assessment-system.onrender.com)
+
+> ⚠️ **Note regarding ML Backend:** The ML model backend (YOLOv8 + PyTorch) is not deployed in the live cloud version due to high memory usage (>512MB RAM exceeding free-tier limits). In the live deployment, the system runs smoothly using a fallback scoring mechanism. To run the full ML computer-vision detection with bounding boxes and live scoring, run the ML service locally.
+
 ## Project Overview
 The City Cleanliness Assessment System is a smart web application designed to analyze and monitor the cleanliness levels of different areas in a city using image-based analysis.
 
