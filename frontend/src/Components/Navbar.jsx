@@ -10,10 +10,16 @@ export default function Navbar({ user }) {
   const [loginOpen, setLoginOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
   const loginDropdownRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -218,8 +224,50 @@ export default function Navbar({ user }) {
             )}
 
           </div>
+
+          {/* Mobile Hamburger Toggle */}
+          <button
+            className="nav-hamburger"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen ? (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            ) : (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+              </svg>
+            )}
+          </button>
         </div>
       </nav>
+
+      {/* Mobile Drawer Menu */}
+      {mobileMenuOpen && (
+        <div className="nav-mobile-overlay" onClick={() => setMobileMenuOpen(false)}>
+          <div className="nav-mobile-menu" onClick={(e) => e.stopPropagation()}>
+            <ul className="nav-mobile-links">
+              {navItems.map(({ label, path }) => (
+                <li
+                  key={path}
+                  className={location.pathname === path ? "active" : ""}
+                  onClick={() => {
+                    navigate(path);
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  {label}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
 
       <Login isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
