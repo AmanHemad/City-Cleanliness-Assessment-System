@@ -32,7 +32,6 @@ const CityMap = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [currentUser, setCurrentUser] = useState(null); // Firebase user tracking
   const [uploadingReportId, setUploadingReportId] = useState(null); // Tracks which report is currently uploading
-  const [isDarkMap, setIsDarkMap] = useState(false);
 
   const contractors = ["Ramesh", "Suresh", "Mahesh"];
   const navigate = useNavigate();
@@ -240,7 +239,7 @@ const CityMap = () => {
         <button onClick={searchLocation}>Search</button>
       </div>
 
-      {/* REPORT BUTTON & THEME BUTTON */}
+      {/* REPORT BUTTON */}
       <div style={{
           position: "absolute",
           top: "20px",
@@ -249,24 +248,6 @@ const CityMap = () => {
           display: "flex",
           gap: "10px"
       }}>
-        <button
-          onClick={() => setIsDarkMap(!isDarkMap)}
-          style={{
-            padding: "10px",
-            background: isDarkMap ? "#1e293b" : "#ffffff",
-            color: isDarkMap ? "#ffffff" : "#000000",
-            border: "2px solid #38bdf8",
-            borderRadius: "8px",
-            cursor: "pointer",
-            fontWeight: "bold",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center"
-          }}
-        >
-          {isDarkMap ? "☀️ Light Map" : "🌙 Dark Map"}
-        </button>
-
         <button
           onClick={() => navigate("/report")}
           style={{
@@ -291,19 +272,10 @@ const CityMap = () => {
           zoom={15}
           style={{ height: "100vh", width: "100%" }}
         >
-          {isDarkMap ? (
-            <TileLayer
-              key="dark-map"
-              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-            />
-          ) : (
-            <TileLayer 
-              key="light-map"
-              url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}" 
-              attribution='&copy; <a href="https://maps.google.com/">Google Maps</a>'
-            />
-          )}
+          <TileLayer 
+            url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}" 
+            attribution='&copy; <a href="https://maps.google.com/">Google Maps</a>'
+          />
 
         <RecenterMap center={mapCenter} />
 
