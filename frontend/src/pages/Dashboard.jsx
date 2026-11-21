@@ -192,7 +192,7 @@ function Dashboard() {
       {/* SPOTLIGHT AREA */}
       <div className="top-card">
         <div className="top-icon">🏆</div>
-        <div>
+        <div className="top-card-content">
           <h3>Top Performer</h3>
           <h2>RGUKT NUZVID</h2>
           <p>Highest cleanliness score based on recent aggregated reports.</p>
