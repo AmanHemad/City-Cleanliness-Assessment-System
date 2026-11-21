@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase";
+import API_URL from "../config/api";
 import Login from "./Login";
 import "./ReportIssue.css";
 
@@ -200,7 +201,7 @@ const handleSubmit = async () => {
         formData.append("username", username);
         formData.append("email", user.email || "No Email");
 
-        const res = await fetch("http://localhost:5000/api/report", {
+        const res = await fetch(`${API_URL}/api/report`, {
           method: "POST",
           body: formData,
         });

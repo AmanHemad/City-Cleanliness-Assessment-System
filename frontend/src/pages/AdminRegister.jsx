@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_URL from "../config/api";
 import "./AdminLogin.css"; // reuse SAME CSS
 
 export default function AdminRegister() {
@@ -30,7 +31,7 @@ export default function AdminRegister() {
     setLoading(true);
 
     try {
-      await axios.post("http://localhost:5000/api/admin/register", form);
+      await axios.post(`${API_URL}/api/admin/register`, form);
 
       alert("Admin Registered Successfully ✅");
       navigate("/admin-login");

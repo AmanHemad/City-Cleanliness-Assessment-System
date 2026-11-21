@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_URL from "../config/api";
 import "./AdminDashboard.css";
 
 export default function AdminDashboard() {
@@ -19,14 +20,14 @@ export default function AdminDashboard() {
           return;
         }
 
-        const res = await axios.get("http://localhost:5000/api/admin/dashboard", {
+        const res = await axios.get(`${API_URL}/api/admin/dashboard`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         setAdminData(res.data.admin);
 
-        const reportsRes = await axios.get("http://localhost:5000/api/report");
+        const reportsRes = await axios.get(`${API_URL}/api/report`);
         const reports = reportsRes.data;
 
         const total = reports.length;

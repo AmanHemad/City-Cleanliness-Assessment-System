@@ -17,8 +17,14 @@ async function scoreWithML(imageUrl) {
 
     console.log("🚀 Sending to ML...");
 
+    const mlEndpoint = process.env.ML_SERVICE_URL
+      ? (process.env.ML_SERVICE_URL.endsWith("/predict/")
+          ? process.env.ML_SERVICE_URL
+          : `${process.env.ML_SERVICE_URL.replace(/\/+$/, "")}/predict/`)
+      : "http://localhost:8000/predict/";
+
     const mlRes = await axios.post(
-      "http://localhost:8000/predict/",
+      mlEndpoint,
       formData,
       {
         headers: formData.getHeaders(),

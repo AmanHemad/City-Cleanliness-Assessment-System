@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase";
+import API_URL from "../config/api";
 import "leaflet/dist/leaflet.css";
 import "./CityMap.css"; // Added CSS import
 
@@ -25,9 +26,8 @@ const RecenterMap = ({ center }) => {
 
 const CityMap = () => {
   const [reports, setReports] = useState([]);
-  const [mapCenter, setMapCenter] = useState([16.5104, 80.6465]);
+  const [mapCenter, setMapCenter] = useState([16.793960, 80.823391]);
   const [search, setSearch] = useState("");
-  const [initialized, setInitialized] = useState(false);
   const [selectedContractor, setSelectedContractor] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [currentUser, setCurrentUser] = useState(null); // Firebase user tracking
@@ -60,7 +60,7 @@ const CityMap = () => {
       return;
     }
 
-    fetch("http://localhost:5000/api/admin/dashboard", {
+    fetch(`${API_URL}/api/admin/dashboard`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -76,19 +76,10 @@ const CityMap = () => {
   // ✅ FETCH REPORTS
   useEffect(() => {
     const fetchReports = () => {
-      fetch("http://localhost:5000/api/report")
+      fetch(`${API_URL}/api/report`)
         .then((res) => res.json())
         .then((data) => {
           setReports(data);
-
-          if (!initialized && data.length > 0) {
-            const latest = data[0];
-            setMapCenter([
-              Number(latest.latitude),
-              Number(latest.longitude)
-            ]);
-            setInitialized(true);
-          }
         })
         .catch((err) => console.error(err));
     };
@@ -97,7 +88,7 @@ const CityMap = () => {
     const interval = setInterval(fetchReports, 5000);
 
     return () => clearInterval(interval);
-  }, [initialized]);
+  }, []);
 
   // ✅ REFRESH MAP
   useEffect(() => {
@@ -149,7 +140,7 @@ const CityMap = () => {
 
     const token = localStorage.getItem("adminToken");
 
-    await fetch("http://localhost:5000/api/assign", {
+    await fetch(`${API_URL}/api/assign`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -175,7 +166,7 @@ const CityMap = () => {
     formData.append("reportId", reportId);
 
     try {
-      await fetch("http://localhost:5000/api/upload-resolved", {
+      await fetch(`${API_URL}/api/upload-resolved`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -195,7 +186,7 @@ const CityMap = () => {
   const resolveReport = async (reportId) => {
     const token = localStorage.getItem("adminToken");
 
-    await fetch("http://localhost:5000/api/resolve", {
+    await fetch(`${API_URL}/api/resolve`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -210,7 +201,7 @@ const CityMap = () => {
   // ✅ CONFIRM RESOLUTION (USER)
   const confirmResolution = async (reportId) => {
     try {
-      const res = await fetch("http://localhost:5000/api/confirm", {
+      const res = await fetch(`${API_URL}/api/confirm`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

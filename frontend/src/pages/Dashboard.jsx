@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import API_URL from "../config/api";
 import "./Dashboard.css";
 
 import { Line, Pie, Bar } from "react-chartjs-2";
@@ -34,7 +35,7 @@ function Dashboard() {
   useEffect(() => {
     const fetchReportsForStats = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/report");
+        const res = await axios.get(`${API_URL}/api/report`);
         const reports = res.data;
         
         if (reports.length > 0) {

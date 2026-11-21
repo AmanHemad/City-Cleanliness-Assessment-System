@@ -3,6 +3,7 @@ import CleaningAnimation from "../Components/CleaningAnimation";
 import "./Home.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import API_URL from "../config/api";
 
 function Home() {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ function Home() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/report");
+        const res = await axios.get(`${API_URL}/api/report`);
         const reportsData = res.data;
         
         // Compute real stats
