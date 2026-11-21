@@ -200,28 +200,38 @@
   }
 
   .top-card {
-    padding: 18px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px 16px;
     gap: 14px;
     margin-bottom: 24px;
   }
 
   .top-icon {
-    width: 54px;
-    height: 54px;
-    min-width: 54px;
-    font-size: 2rem;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    font-size: 1.8rem;
+  }
+
+  .top-card-info {
+    width: 100%;
   }
 
   .top-card h3 {
     font-size: 0.8rem;
+    margin-bottom: 4px;
   }
 
   .top-card h2 {
-    font-size: 1.35rem;
+    font-size: 1.5rem;
+    line-height: 1.2;
+    margin-bottom: 6px;
   }
 
   .top-card p {
-    font-size: 0.82rem;
+    font-size: 0.85rem;
+    line-height: 1.4;
   }
 
   .kpi-grid {
